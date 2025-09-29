@@ -1,616 +1,598 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
-    span.s1 {font: 12.0px Helvetica}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #4a90e2, #7b68ee); 
+            min-height: 100vh; 
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .login-form, .budget-setup { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            max-width: 500px; 
+            margin: 50px auto; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .dashboard { display: none; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .savings-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .categories-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        .category-card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 16px;
+        }
+        button { 
+            background: #4a90e2; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover { background: #357abd; }
+        .login-btn, .setup-btn { width: 100%; padding: 15px; font-size: 18px; margin-top: 15px; }
+        .progress-bar { 
+            width: 100%; 
+            height: 12px; 
+            background: #eee; 
+            border-radius: 6px; 
+            margin: 15px 0; 
+        }
+        .progress-fill { 
+            height: 100%; 
+            border-radius: 6px; 
+            transition: width 0.3s; 
+        }
+        .expense-form { display: flex; gap: 10px; margin-top: 15px; }
+        .expense-form input { margin: 0; flex: 1; }
+        .expense-form button { flex: none; }
+        .budget-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .budget-item { 
+            text-align: left; 
+            padding: 15px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+        }
+        .budget-item label { 
+            font-weight: bold; 
+            color: #333; 
+            margin-bottom: 8px; 
+            display: block; 
+        }
+        .loading { color: #666; font-style: italic; }
+        .toggle-auth {
+            margin-top: 20px;
+            color: #4a90e2;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .toggle-auth:hover {
+            color: #357abd;
+        }
+        .form-group {
+            text-align: left;
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        h2 { color: #333; margin-bottom: 20px; }
+        h3 { margin-bottom: 15px; color: #333; }
+        .savings-amount { font-size: 2.5rem; color: #2ecc71; font-weight: bold; }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Budget Tracker&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>* { margin: 0; padding: 0; box-sizing: border-box; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: Arial, sans-serif;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #4a90e2, #7b68ee);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.container { max-width: 1200px; margin: 0 auto; padding: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.login-form, .budget-setup {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 30px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 500px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 50px auto;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 10px 30px rgba(0,0,0,0.2);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.dashboard { display: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header { text-align: center; color: white; margin-bottom: 30px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.savings-card {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 30px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 30px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 5px 20px rgba(0,0,0,0.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.categories-grid {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: grid;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 20px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.category-card {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 25px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 5px 20px rgba(0,0,0,0.1);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>input {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 10px 0;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #ddd;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>button {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #4a90e2;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 25px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>button:hover { background: #357abd; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.login-btn, .setup-btn { width: 100%; padding: 15px; font-size: 18px; margin-top: 15px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.progress-bar {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 12px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #eee;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 6px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 15px 0;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.progress-fill {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 6px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: width 0.3s;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.expense-form { display: flex; gap: 10px; margin-top: 15px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.expense-form input { margin: 0; flex: 1; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.expense-form button { flex: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.budget-grid {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: grid;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 20px 0;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.budget-item {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: left;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #f8f9fa;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.budget-item label {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #333;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 8px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: block;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.loading { color: #666; font-style: italic; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.toggle-auth {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #4a90e2;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-decoration: underline;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.toggle-auth:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #357abd;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.form-group {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: left;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 15px 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.form-group label {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #333;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>h1 { font-size: 2.2rem; margin-bottom: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>h2 { color: #333; margin-bottom: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>h3 { margin-bottom: 15px; color: #333; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.savings-amount { font-size: 2.5rem; color: #2ecc71; font-weight: bold; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Login/Register Section --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="loginSection" class="login-form"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2 id="authTitle"&gt;Login to Budget Tracker&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style="color: #666; margin-bottom: 25px;"&gt;Track your expenses smartly&lt;/p&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;form id="authForm"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="form-group" id="nameGroup" style="display: none;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="userName"&gt;Full Name&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" id="userName" placeholder="Enter your full name"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="loginEmail"&gt;Email&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="email" id="loginEmail" placeholder="Enter your email" required&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="loginPassword"&gt;Password&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="password" id="loginPassword" placeholder="Enter your password" required&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="form-group" id="savingsGroup" style="display: none;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="initialSavingsTarget"&gt;Monthly Savings Target ($)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="number" id="initialSavingsTarget" placeholder="e.g. 1000" step="0.01" value="1000"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button type="submit" class="login-btn" id="authButton"&gt;Login&lt;/button&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="toggle-auth" id="toggleAuth" onclick="toggleAuthMode()"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>Don't have an account? Register here</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/form&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="loginMessage" style="margin-top: 15px;"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Budget Setup Section --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="budgetSetupSection" class="budget-setup" style="display: none;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Set Your Monthly Budget&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style="color: #666; margin-bottom: 25px;"&gt;Configure your spending limits for each category&lt;/p&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="margin-bottom: 20px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;label for="savingsTarget" style="display: block; margin-bottom: 8px; font-weight: bold;"&gt;Monthly Savings Target ($)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="number" id="savingsTarget" placeholder="e.g. 1000" step="0.01" value="1000"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="budget-grid" id="budgetGrid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="loading"&gt;Loading categories...&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="setup-btn" onclick="saveBudgetLimits()"&gt;Save Budget &amp; Continue&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="setupMessage" style="margin-top: 15px;"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Dashboard Section --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="dashboardSection" class="dashboard"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h1&gt;Budget Dashboard&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span id="welcomeText" style="margin-right: 20px;"&gt;&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="showBudgetSetup()"&gt;Update Budget&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="handleLogout()"&gt;Logout&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="savings-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="savings-amount" id="savingsAmount"&gt;$0.00&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p&gt;Available for Savings This Month&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="refreshData()"&gt;Refresh Data&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="categories-grid" id="categoriesGrid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="loading"&gt;Loading categories...&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p3"><span class="s1"><span class="Apple-converted-space">        </span>const BASE_URL = “</span>https://budget-tracker-backend-cmeh.onrender.com”<span class="s1">;</span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>let user = null;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let categories = [];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let budgetData = [];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let isLoginMode = true;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function toggleAuthMode() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>isLoginMode = !isLoginMode;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const authTitle = document.getElementById('authTitle');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const authButton = document.getElementById('authButton');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const toggleAuth = document.getElementById('toggleAuth');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const nameGroup = document.getElementById('nameGroup');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const savingsGroup = document.getElementById('savingsGroup');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (isLoginMode) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>authTitle.textContent = 'Login to Budget Tracker';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>authButton.textContent = 'Login';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>toggleAuth.textContent = "Don't have an account? Register here";</p>
-<p class="p1"><span class="Apple-converted-space">                </span>nameGroup.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>savingsGroup.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>authTitle.textContent = 'Register for Budget Tracker';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>authButton.textContent = 'Register';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>toggleAuth.textContent = 'Already have an account? Login here';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>nameGroup.style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>savingsGroup.style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('authForm').addEventListener('submit', function(e) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>e.preventDefault();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (isLoginMode) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>handleLogin();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>handleRegister();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function handleLogin() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const email = document.getElementById('loginEmail').value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const password = document.getElementById('loginPassword').value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const messageDiv = document.getElementById('loginMessage');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!email || !password) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.textContent = 'Please enter both email and password';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>messageDiv.textContent = 'Logging in...';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>messageDiv.style.color = '#666';</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(BASE_URL + '/login', {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>method: 'POST',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>headers: { 'Content-Type': 'application/json' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>body: JSON.stringify({ email: email, password: password })</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (response.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const result = await response.json();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>user = { id: result.user_id, name: result.name, email: result.email };</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.textContent = '';</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await loadCategories();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await checkBudgetSetup();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.textContent = 'Invalid email or password';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.textContent = 'Cannot connect to backend on port 8000';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function handleRegister() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const email = document.getElementById('loginEmail').value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const password = document.getElementById('loginPassword').value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const name = document.getElementById('userName').value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const savingsTarget = parseFloat(document.getElementById('initialSavingsTarget').value) || 1000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const messageDiv = document.getElementById('loginMessage');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!email || !password || !name) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.textContent = 'Please fill in all fields';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>messageDiv.textContent = 'Creating account...';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>messageDiv.style.color = '#666';</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(BASE_URL + '/register', {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>method: 'POST',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>headers: { 'Content-Type': 'application/json' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>body: JSON.stringify({<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>email: email,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>password: password,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>name: name,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>monthly_savings_target: savingsTarget</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>})</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (response.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.textContent = 'Account created successfully! Please login.';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.style.color = 'green';</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// Switch back to login mode</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>setTimeout(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>toggleAuthMode();</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('loginEmail').value = email;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('loginPassword').value = password;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>messageDiv.textContent = '';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}, 2000);</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const errorData = await response.json();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.textContent = errorData.error || 'Registration failed';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.textContent = 'Cannot connect to backend';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function loadCategories() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(BASE_URL + '/categories');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (response.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>categories = await response.json();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error('Categories error:', error);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function checkBudgetSetup() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(BASE_URL + '/budget-status/' + user.id);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (response.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>budgetData = await response.json();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (budgetData.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showBudgetSetupScreen();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showDashboard();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showBudgetSetupScreen();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showBudgetSetupScreen();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function showBudgetSetupScreen() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('loginSection').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('budgetSetupSection').style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('dashboardSection').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderBudgetSetup();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function showBudgetSetup() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>showBudgetSetupScreen();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderBudgetSetup() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const grid = document.getElementById('budgetGrid');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (categories.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>grid.innerHTML = '&lt;div class="loading"&gt;Loading categories...&lt;/div&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid.innerHTML = '';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>categories.forEach(category =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const currentBudget = budgetData.find(b =&gt; b.category_id === category.id);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const defaultAmount = currentBudget ? currentBudget.limit : getDefaultBudget(category.name);</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const budgetItem = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>budgetItem.className = 'budget-item';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>budgetItem.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label&gt;${category.icon} ${category.name}&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="number" id="budget-${category.id}"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                           </span>placeholder="Monthly limit" step="0.01"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                           </span>value="${defaultAmount}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>grid.appendChild(budgetItem);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function getDefaultBudget(categoryName) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const defaults = {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>'Groceries': 400,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>'Outside Food': 200,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>'Gas': 250,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>'Rent': 1200,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>'Lent Money': 150,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>'Additional': 300</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return defaults[categoryName] || 200;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function saveBudgetLimits() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const messageDiv = document.getElementById('setupMessage');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const savingsTarget = parseFloat(document.getElementById('savingsTarget').value) || 1000;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const limits = [];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let hasError = false;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>categories.forEach(category =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const budgetInput = document.getElementById('budget-' + category.id);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const amount = parseFloat(budgetInput.value);</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!amount || amount &lt;= 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>budgetInput.style.borderColor = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>hasError = true;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>budgetInput.style.borderColor = '#ddd';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>limits.push({</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>category_id: category.id,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>amount: amount</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (hasError) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.textContent = 'Please enter valid amounts for all categories';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>messageDiv.textContent = 'Saving budget limits...';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>messageDiv.style.color = '#666';</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(BASE_URL + '/budget-limits', {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>method: 'POST',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>headers: { 'Content-Type': 'application/json' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>body: JSON.stringify({</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>user_id: user.id,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>monthly_savings_target: savingsTarget,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>limits: limits</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>})</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (response.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.textContent = 'Budget saved successfully!';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.style.color = 'green';</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>setTimeout(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showDashboard();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}, 1000);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.textContent = 'Failed to save budget';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.textContent = 'Connection error';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>messageDiv.style.color = 'red';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function showDashboard() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('loginSection').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('budgetSetupSection').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('dashboardSection').style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('welcomeText').textContent = `Welcome, ${user.name}!`;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>await loadBudgetData();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function loadBudgetData() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!user) return;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(BASE_URL + '/budget-status/' + user.id);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (response.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>budgetData = await response.json();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>renderCategories();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>updateSavings();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error('Budget data error:', error);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderCategories() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const grid = document.getElementById('categoriesGrid');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (categories.length === 0 || budgetData.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>grid.innerHTML = '&lt;div class="loading"&gt;Loading categories...&lt;/div&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid.innerHTML = '';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>categories.forEach(category =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const budget = budgetData.find(b =&gt; b.category_id === category.id) || {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>limit: 0, spent: 0, remaining: 0, percentage: 0</p>
-<p class="p1"><span class="Apple-converted-space">                </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const card = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>card.className = 'category-card';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>card.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3&gt;${category.icon} ${category.name}&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="progress-bar"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="progress-fill" style="width: ${budget.percentage}%; background: ${category.color};"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p&gt;&lt;strong&gt;Spent:&lt;/strong&gt; $${budget.spent.toFixed(2)}&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p&gt;&lt;strong&gt;Budget:&lt;/strong&gt; $${budget.limit.toFixed(2)}&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p&gt;&lt;strong&gt;Remaining:&lt;/strong&gt; $${budget.remaining.toFixed(2)}&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="expense-form"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="number" id="amount-${category.id}" placeholder="Amount" step="0.01"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="desc-${category.id}" placeholder="Description"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button onclick="addExpense(${category.id}, '${category.name}')"&gt;Add&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>grid.appendChild(card);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function addExpense(categoryId, categoryName) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const amountInput = document.getElementById('amount-' + categoryId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const descInput = document.getElementById('desc-' + categoryId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const amount = parseFloat(amountInput.value);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const description = descInput.value || 'Expense';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!amount || amount &lt;= 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>alert('Please enter a valid amount');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(BASE_URL + '/expenses', {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>method: 'POST',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>headers: { 'Content-Type': 'application/json' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>body: JSON.stringify({</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>user_id: user.id,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>category_id: categoryId,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>amount: amount,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>description: description</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>})</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (response.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>alert(`SUCCESS: $${amount.toFixed(2)} added to ${categoryName}!`);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>amountInput.value = '';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>descInput.value = '';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await loadBudgetData();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>alert('Failed to add expense');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>alert('Connection error: ' + error.message);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateSavings() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (budgetData.length === 0) return;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const totalBudget = budgetData.reduce((sum, b) =&gt; sum + b.limit, 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const totalSpent = budgetData.reduce((sum, b) =&gt; sum + b.spent, 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const savings = Math.max(0, totalBudget - totalSpent);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('savingsAmount').textContent = '$' + savings.toFixed(2);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function refreshData() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>await loadBudgetData();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function handleLogout() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>user = null;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>categories = [];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>budgetData = [];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>isLoginMode = true;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('loginSection').style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('budgetSetupSection').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('dashboardSection').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('authForm').reset();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('loginMessage').textContent = '';</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Reset to login mode</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('authTitle').textContent = 'Login to Budget Tracker';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('authButton').textContent = 'Login';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('toggleAuth').textContent = "Don't have an account? Register here";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('nameGroup').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('savingsGroup').style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div class="container">
+        <!-- Login/Register Section -->
+        <div id="loginSection" class="login-form">
+            <h2 id="authTitle">Login to Budget Tracker</h2>
+            <p style="color: #666; margin-bottom: 25px;">Track your expenses smartly</p>
+            
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">Full Name</label>
+                    <input type="text" id="userName" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                
+                <div class="form-group" id="savingsGroup" style="display: none;">
+                    <label for="initialSavingsTarget">Monthly Savings Target ($)</label>
+                    <input type="number" id="initialSavingsTarget" placeholder="e.g. 1000" step="0.01" value="1000">
+                </div>
+                
+                <button type="submit" class="login-btn" id="authButton">Login</button>
+                
+                <div class="toggle-auth" id="toggleAuth" onclick="toggleAuthMode()">
+                    Don't have an account? Register here
+                </div>
+            </form>
+            
+            <div id="loginMessage" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Budget Setup Section -->
+        <div id="budgetSetupSection" class="budget-setup" style="display: none;">
+            <h2>Set Your Monthly Budget</h2>
+            <p style="color: #666; margin-bottom: 25px;">Configure your spending limits for each category</p>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="savingsTarget" style="display: block; margin-bottom: 8px; font-weight: bold;">Monthly Savings Target ($)</label>
+                <input type="number" id="savingsTarget" placeholder="e.g. 1000" step="0.01" value="1000">
+            </div>
+
+            <div class="budget-grid" id="budgetGrid">
+                <div class="loading">Loading categories...</div>
+            </div>
+
+            <button class="setup-btn" onclick="saveBudgetLimits()">Save Budget & Continue</button>
+            <div id="setupMessage" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="dashboard">
+            <div class="header">
+                <h1>Budget Dashboard</h1>
+                <div>
+                    <span id="welcomeText" style="margin-right: 20px;"></span>
+                    <button onclick="showBudgetSetup()">Update Budget</button>
+                    <button onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="savings-card">
+                <div class="savings-amount" id="savingsAmount">$0.00</div>
+                <p>Available for Savings This Month</p>
+                <button onclick="refreshData()">Refresh Data</button>
+            </div>
+
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="loading">Loading categories...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8000/api';
+        let user = null;
+        let categories = [];
+        let budgetData = [];
+        let isLoginMode = true;
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const authTitle = document.getElementById('authTitle');
+            const authButton = document.getElementById('authButton');
+            const toggleAuth = document.getElementById('toggleAuth');
+            const nameGroup = document.getElementById('nameGroup');
+            const savingsGroup = document.getElementById('savingsGroup');
+            
+            if (isLoginMode) {
+                authTitle.textContent = 'Login to Budget Tracker';
+                authButton.textContent = 'Login';
+                toggleAuth.textContent = "Don't have an account? Register here";
+                nameGroup.style.display = 'none';
+                savingsGroup.style.display = 'none';
+            } else {
+                authTitle.textContent = 'Register for Budget Tracker';
+                authButton.textContent = 'Register';
+                toggleAuth.textContent = 'Already have an account? Login here';
+                nameGroup.style.display = 'block';
+                savingsGroup.style.display = 'block';
+            }
+        }
+
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (isLoginMode) {
+                handleLogin();
+            } else {
+                handleRegister();
+            }
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            if (!email || !password) {
+                messageDiv.textContent = 'Please enter both email and password';
+                messageDiv.style.color = 'red';
+                return;
+            }
+            
+            messageDiv.textContent = 'Logging in...';
+            messageDiv.style.color = '#666';
+            
+            try {
+                const response = await fetch(BASE_URL + '/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    user = { id: result.user_id, name: result.name, email: result.email };
+                    messageDiv.textContent = '';
+                    
+                    await loadCategories();
+                    await checkBudgetSetup();
+                } else {
+                    messageDiv.textContent = 'Invalid email or password';
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Cannot connect to backend on port 8000';
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function handleRegister() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const name = document.getElementById('userName').value;
+            const savingsTarget = parseFloat(document.getElementById('initialSavingsTarget').value) || 1000;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            if (!email || !password || !name) {
+                messageDiv.textContent = 'Please fill in all fields';
+                messageDiv.style.color = 'red';
+                return;
+            }
+            
+            messageDiv.textContent = 'Creating account...';
+            messageDiv.style.color = '#666';
+            
+            try {
+                const response = await fetch(BASE_URL + '/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: email, 
+                        password: password, 
+                        name: name,
+                        monthly_savings_target: savingsTarget
+                    })
+                });
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Account created successfully! Please login.';
+                    messageDiv.style.color = 'green';
+                    
+                    // Switch back to login mode
+                    setTimeout(() => {
+                        toggleAuthMode();
+                        document.getElementById('loginEmail').value = email;
+                        document.getElementById('loginPassword').value = password;
+                        messageDiv.textContent = '';
+                    }, 2000);
+                    
+                } else {
+                    const errorData = await response.json();
+                    messageDiv.textContent = errorData.error || 'Registration failed';
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Cannot connect to backend';
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch(BASE_URL + '/categories');
+                if (response.ok) {
+                    categories = await response.json();
+                }
+            } catch (error) {
+                console.error('Categories error:', error);
+            }
+        }
+
+        async function checkBudgetSetup() {
+            try {
+                const response = await fetch(BASE_URL + '/budget-status/' + user.id);
+                if (response.ok) {
+                    budgetData = await response.json();
+                    if (budgetData.length === 0) {
+                        showBudgetSetupScreen();
+                    } else {
+                        showDashboard();
+                    }
+                } else {
+                    showBudgetSetupScreen();
+                }
+            } catch (error) {
+                showBudgetSetupScreen();
+            }
+        }
+
+        function showBudgetSetupScreen() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('budgetSetupSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+            renderBudgetSetup();
+        }
+
+        function showBudgetSetup() {
+            showBudgetSetupScreen();
+        }
+
+        function renderBudgetSetup() {
+            const grid = document.getElementById('budgetGrid');
+            
+            if (categories.length === 0) {
+                grid.innerHTML = '<div class="loading">Loading categories...</div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+
+            categories.forEach(category => {
+                const currentBudget = budgetData.find(b => b.category_id === category.id);
+                const defaultAmount = currentBudget ? currentBudget.limit : getDefaultBudget(category.name);
+                
+                const budgetItem = document.createElement('div');
+                budgetItem.className = 'budget-item';
+                budgetItem.innerHTML = `
+                    <label>${category.icon} ${category.name}</label>
+                    <input type="number" id="budget-${category.id}" 
+                           placeholder="Monthly limit" step="0.01" 
+                           value="${defaultAmount}">
+                `;
+                grid.appendChild(budgetItem);
+            });
+        }
+
+        function getDefaultBudget(categoryName) {
+            const defaults = {
+                'Groceries': 400,
+                'Outside Food': 200,
+                'Gas': 250,
+                'Rent': 1200,
+                'Lent Money': 150,
+                'Additional': 300
+            };
+            return defaults[categoryName] || 200;
+        }
+
+        async function saveBudgetLimits() {
+            const messageDiv = document.getElementById('setupMessage');
+            const savingsTarget = parseFloat(document.getElementById('savingsTarget').value) || 1000;
+            
+            const limits = [];
+            let hasError = false;
+            
+            categories.forEach(category => {
+                const budgetInput = document.getElementById('budget-' + category.id);
+                const amount = parseFloat(budgetInput.value);
+                
+                if (!amount || amount <= 0) {
+                    budgetInput.style.borderColor = 'red';
+                    hasError = true;
+                } else {
+                    budgetInput.style.borderColor = '#ddd';
+                    limits.push({
+                        category_id: category.id,
+                        amount: amount
+                    });
+                }
+            });
+            
+            if (hasError) {
+                messageDiv.textContent = 'Please enter valid amounts for all categories';
+                messageDiv.style.color = 'red';
+                return;
+            }
+            
+            messageDiv.textContent = 'Saving budget limits...';
+            messageDiv.style.color = '#666';
+            
+            try {
+                const response = await fetch(BASE_URL + '/budget-limits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        monthly_savings_target: savingsTarget,
+                        limits: limits
+                    })
+                });
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Budget saved successfully!';
+                    messageDiv.style.color = 'green';
+                    
+                    setTimeout(() => {
+                        showDashboard();
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = 'Failed to save budget';
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Connection error';
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('budgetSetupSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            document.getElementById('welcomeText').textContent = `Welcome, ${user.name}!`;
+            
+            await loadBudgetData();
+        }
+
+        async function loadBudgetData() {
+            if (!user) return;
+            
+            try {
+                const response = await fetch(BASE_URL + '/budget-status/' + user.id);
+                if (response.ok) {
+                    budgetData = await response.json();
+                    renderCategories();
+                    updateSavings();
+                }
+            } catch (error) {
+                console.error('Budget data error:', error);
+            }
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            
+            if (categories.length === 0 || budgetData.length === 0) {
+                grid.innerHTML = '<div class="loading">Loading categories...</div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+
+            categories.forEach(category => {
+                const budget = budgetData.find(b => b.category_id === category.id) || {
+                    limit: 0, spent: 0, remaining: 0, percentage: 0
+                };
+
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                    <h3>${category.icon} ${category.name}</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${budget.percentage}%; background: ${category.color};"></div>
+                    </div>
+                    <p><strong>Spent:</strong> $${budget.spent.toFixed(2)}</p>
+                    <p><strong>Budget:</strong> $${budget.limit.toFixed(2)}</p>
+                    <p><strong>Remaining:</strong> $${budget.remaining.toFixed(2)}</p>
+                    <div class="expense-form">
+                        <input type="number" id="amount-${category.id}" placeholder="Amount" step="0.01">
+                        <input type="text" id="desc-${category.id}" placeholder="Description">
+                        <button onclick="addExpense(${category.id}, '${category.name}')">Add</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function addExpense(categoryId, categoryName) {
+            const amountInput = document.getElementById('amount-' + categoryId);
+            const descInput = document.getElementById('desc-' + categoryId);
+            const amount = parseFloat(amountInput.value);
+            const description = descInput.value || 'Expense';
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            try {
+                const response = await fetch(BASE_URL + '/expenses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        category_id: categoryId,
+                        amount: amount,
+                        description: description
+                    })
+                });
+
+                if (response.ok) {
+                    alert(`SUCCESS: $${amount.toFixed(2)} added to ${categoryName}!`);
+                    amountInput.value = '';
+                    descInput.value = '';
+                    await loadBudgetData();
+                } else {
+                    alert('Failed to add expense');
+                }
+            } catch (error) {
+                alert('Connection error: ' + error.message);
+            }
+        }
+
+        function updateSavings() {
+            if (budgetData.length === 0) return;
+            
+            const totalBudget = budgetData.reduce((sum, b) => sum + b.limit, 0);
+            const totalSpent = budgetData.reduce((sum, b) => sum + b.spent, 0);
+            const savings = Math.max(0, totalBudget - totalSpent);
+            
+            document.getElementById('savingsAmount').textContent = '$' + savings.toFixed(2);
+        }
+
+        async function refreshData() {
+            await loadBudgetData();
+        }
+
+        function handleLogout() {
+            user = null;
+            categories = [];
+            budgetData = [];
+            isLoginMode = true;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('budgetSetupSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('authForm').reset();
+            document.getElementById('loginMessage').textContent = '';
+            
+            // Reset to login mode
+            document.getElementById('authTitle').textContent = 'Login to Budget Tracker';
+            document.getElementById('authButton').textContent = 'Login';
+            document.getElementById('toggleAuth').textContent = "Don't have an account? Register here";
+            document.getElementById('nameGroup').style.display = 'none';
+            document.getElementById('savingsGroup').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
