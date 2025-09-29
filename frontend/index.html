@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #4a90e2, #7b68ee); 
+            min-height: 100vh; 
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .login-form, .budget-setup { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            max-width: 500px; 
+            margin: 50px auto; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .dashboard { display: none; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .savings-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .categories-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        .category-card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 16px;
+        }
+        button { 
+            background: #4a90e2; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover { background: #357abd; }
+        .login-btn, .setup-btn { width: 100%; padding: 15px; font-size: 18px; margin-top: 15px; }
+        .progress-bar { 
+            width: 100%; 
+            height: 12px; 
+            background: #eee; 
+            border-radius: 6px; 
+            margin: 15px 0; 
+        }
+        .progress-fill { 
+            height: 100%; 
+            border-radius: 6px; 
+            transition: width 0.3s; 
+        }
+        .expense-form { display: flex; gap: 10px; margin-top: 15px; }
+        .expense-form input { margin: 0; flex: 1; }
+        .expense-form button { flex: none; }
+        .budget-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .budget-item { 
+            text-align: left; 
+            padding: 15px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+        }
+        .budget-item label { 
+            font-weight: bold; 
+            color: #333; 
+            margin-bottom: 8px; 
+            display: block; 
+        }
+        .loading { color: #666; font-style: italic; }
+        .toggle-auth {
+            margin-top: 20px;
+            color: #4a90e2;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .toggle-auth:hover {
+            color: #357abd;
+        }
+        .form-group {
+            text-align: left;
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        h2 { color: #333; margin-bottom: 20px; }
+        h3 { margin-bottom: 15px; color: #333; }
+        .savings-amount { font-size: 2.5rem; color: #2ecc71; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login/Register Section -->
+        <div id="loginSection" class="login-form">
+            <h2 id="authTitle">Login to Budget Tracker</h2>
+            <p style="color: #666; margin-bottom: 25px;">Track your expenses smartly</p>
+            
+            <form id="authForm">
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">Full Name</label>
+                    <input type="text" id="userName" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                
+                <div class="form-group" id="savingsGroup" style="display: none;">
+                    <label for="initialSavingsTarget">Monthly Savings Target ($)</label>
+                    <input type="number" id="initialSavingsTarget" placeholder="e.g. 1000" step="0.01" value="1000">
+                </div>
+                
+                <button type="submit" class="login-btn" id="authButton">Login</button>
+                
+                <div class="toggle-auth" id="toggleAuth" onclick="toggleAuthMode()">
+                    Don't have an account? Register here
+                </div>
+            </form>
+            
+            <div id="loginMessage" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Budget Setup Section -->
+        <div id="budgetSetupSection" class="budget-setup" style="display: none;">
+            <h2>Set Your Monthly Budget</h2>
+            <p style="color: #666; margin-bottom: 25px;">Configure your spending limits for each category</p>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="savingsTarget" style="display: block; margin-bottom: 8px; font-weight: bold;">Monthly Savings Target ($)</label>
+                <input type="number" id="savingsTarget" placeholder="e.g. 1000" step="0.01" value="1000">
+            </div>
+
+            <div class="budget-grid" id="budgetGrid">
+                <div class="loading">Loading categories...</div>
+            </div>
+
+            <button class="setup-btn" onclick="saveBudgetLimits()">Save Budget & Continue</button>
+            <div id="setupMessage" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="dashboard">
+            <div class="header">
+                <h1>Budget Dashboard</h1>
+                <div>
+                    <span id="welcomeText" style="margin-right: 20px;"></span>
+                    <button onclick="showBudgetSetup()">Update Budget</button>
+                    <button onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="savings-card">
+                <div class="savings-amount" id="savingsAmount">$0.00</div>
+                <p>Available for Savings This Month</p>
+                <button onclick="refreshData()">Refresh Data</button>
+            </div>
+
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="loading">Loading categories...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8000/api';
+        let user = null;
+        let categories = [];
+        let budgetData = [];
+        let isLoginMode = true;
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const authTitle = document.getElementById('authTitle');
+            const authButton = document.getElementById('authButton');
+            const toggleAuth = document.getElementById('toggleAuth');
+            const nameGroup = document.getElementById('nameGroup');
+            const savingsGroup = document.getElementById('savingsGroup');
+            
+            if (isLoginMode) {
+                authTitle.textContent = 'Login to Budget Tracker';
+                authButton.textContent = 'Login';
+                toggleAuth.textContent = "Don't have an account? Register here";
+                nameGroup.style.display = 'none';
+                savingsGroup.style.display = 'none';
+            } else {
+                authTitle.textContent = 'Register for Budget Tracker';
+                authButton.textContent = 'Register';
+                toggleAuth.textContent = 'Already have an account? Login here';
+                nameGroup.style.display = 'block';
+                savingsGroup.style.display = 'block';
+            }
+        }
+
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (isLoginMode) {
+                handleLogin();
+            } else {
+                handleRegister();
+            }
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            if (!email || !password) {
+                messageDiv.textContent = 'Please enter both email and password';
+                messageDiv.style.color = 'red';
+                return;
+            }
+            
+            messageDiv.textContent = 'Logging in...';
+            messageDiv.style.color = '#666';
+            
+            try {
+                const response = await fetch(BASE_URL + '/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    user = { id: result.user_id, name: result.name, email: result.email };
+                    messageDiv.textContent = '';
+                    
+                    await loadCategories();
+                    await checkBudgetSetup();
+                } else {
+                    messageDiv.textContent = 'Invalid email or password';
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Cannot connect to backend on port 8000';
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function handleRegister() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const name = document.getElementById('userName').value;
+            const savingsTarget = parseFloat(document.getElementById('initialSavingsTarget').value) || 1000;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            if (!email || !password || !name) {
+                messageDiv.textContent = 'Please fill in all fields';
+                messageDiv.style.color = 'red';
+                return;
+            }
+            
+            messageDiv.textContent = 'Creating account...';
+            messageDiv.style.color = '#666';
+            
+            try {
+                const response = await fetch(BASE_URL + '/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: email, 
+                        password: password, 
+                        name: name,
+                        monthly_savings_target: savingsTarget
+                    })
+                });
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Account created successfully! Please login.';
+                    messageDiv.style.color = 'green';
+                    
+                    // Switch back to login mode
+                    setTimeout(() => {
+                        toggleAuthMode();
+                        document.getElementById('loginEmail').value = email;
+                        document.getElementById('loginPassword').value = password;
+                        messageDiv.textContent = '';
+                    }, 2000);
+                    
+                } else {
+                    const errorData = await response.json();
+                    messageDiv.textContent = errorData.error || 'Registration failed';
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Cannot connect to backend';
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch(BASE_URL + '/categories');
+                if (response.ok) {
+                    categories = await response.json();
+                }
+            } catch (error) {
+                console.error('Categories error:', error);
+            }
+        }
+
+        async function checkBudgetSetup() {
+            try {
+                const response = await fetch(BASE_URL + '/budget-status/' + user.id);
+                if (response.ok) {
+                    budgetData = await response.json();
+                    if (budgetData.length === 0) {
+                        showBudgetSetupScreen();
+                    } else {
+                        showDashboard();
+                    }
+                } else {
+                    showBudgetSetupScreen();
+                }
+            } catch (error) {
+                showBudgetSetupScreen();
+            }
+        }
+
+        function showBudgetSetupScreen() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('budgetSetupSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+            renderBudgetSetup();
+        }
+
+        function showBudgetSetup() {
+            showBudgetSetupScreen();
+        }
+
+        function renderBudgetSetup() {
+            const grid = document.getElementById('budgetGrid');
+            
+            if (categories.length === 0) {
+                grid.innerHTML = '<div class="loading">Loading categories...</div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+
+            categories.forEach(category => {
+                const currentBudget = budgetData.find(b => b.category_id === category.id);
+                const defaultAmount = currentBudget ? currentBudget.limit : getDefaultBudget(category.name);
+                
+                const budgetItem = document.createElement('div');
+                budgetItem.className = 'budget-item';
+                budgetItem.innerHTML = `
+                    <label>${category.icon} ${category.name}</label>
+                    <input type="number" id="budget-${category.id}" 
+                           placeholder="Monthly limit" step="0.01" 
+                           value="${defaultAmount}">
+                `;
+                grid.appendChild(budgetItem);
+            });
+        }
+
+        function getDefaultBudget(categoryName) {
+            const defaults = {
+                'Groceries': 400,
+                'Outside Food': 200,
+                'Gas': 250,
+                'Rent': 1200,
+                'Lent Money': 150,
+                'Additional': 300
+            };
+            return defaults[categoryName] || 200;
+        }
+
+        async function saveBudgetLimits() {
+            const messageDiv = document.getElementById('setupMessage');
+            const savingsTarget = parseFloat(document.getElementById('savingsTarget').value) || 1000;
+            
+            const limits = [];
+            let hasError = false;
+            
+            categories.forEach(category => {
+                const budgetInput = document.getElementById('budget-' + category.id);
+                const amount = parseFloat(budgetInput.value);
+                
+                if (!amount || amount <= 0) {
+                    budgetInput.style.borderColor = 'red';
+                    hasError = true;
+                } else {
+                    budgetInput.style.borderColor = '#ddd';
+                    limits.push({
+                        category_id: category.id,
+                        amount: amount
+                    });
+                }
+            });
+            
+            if (hasError) {
+                messageDiv.textContent = 'Please enter valid amounts for all categories';
+                messageDiv.style.color = 'red';
+                return;
+            }
+            
+            messageDiv.textContent = 'Saving budget limits...';
+            messageDiv.style.color = '#666';
+            
+            try {
+                const response = await fetch(BASE_URL + '/budget-limits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        monthly_savings_target: savingsTarget,
+                        limits: limits
+                    })
+                });
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Budget saved successfully!';
+                    messageDiv.style.color = 'green';
+                    
+                    setTimeout(() => {
+                        showDashboard();
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = 'Failed to save budget';
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Connection error';
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('budgetSetupSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            document.getElementById('welcomeText').textContent = `Welcome, ${user.name}!`;
+            
+            await loadBudgetData();
+        }
+
+        async function loadBudgetData() {
+            if (!user) return;
+            
+            try {
+                const response = await fetch(BASE_URL + '/budget-status/' + user.id);
+                if (response.ok) {
+                    budgetData = await response.json();
+                    renderCategories();
+                    updateSavings();
+                }
+            } catch (error) {
+                console.error('Budget data error:', error);
+            }
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            
+            if (categories.length === 0 || budgetData.length === 0) {
+                grid.innerHTML = '<div class="loading">Loading categories...</div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+
+            categories.forEach(category => {
+                const budget = budgetData.find(b => b.category_id === category.id) || {
+                    limit: 0, spent: 0, remaining: 0, percentage: 0
+                };
+
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                    <h3>${category.icon} ${category.name}</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${budget.percentage}%; background: ${category.color};"></div>
+                    </div>
+                    <p><strong>Spent:</strong> $${budget.spent.toFixed(2)}</p>
+                    <p><strong>Budget:</strong> $${budget.limit.toFixed(2)}</p>
+                    <p><strong>Remaining:</strong> $${budget.remaining.toFixed(2)}</p>
+                    <div class="expense-form">
+                        <input type="number" id="amount-${category.id}" placeholder="Amount" step="0.01">
+                        <input type="text" id="desc-${category.id}" placeholder="Description">
+                        <button onclick="addExpense(${category.id}, '${category.name}')">Add</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function addExpense(categoryId, categoryName) {
+            const amountInput = document.getElementById('amount-' + categoryId);
+            const descInput = document.getElementById('desc-' + categoryId);
+            const amount = parseFloat(amountInput.value);
+            const description = descInput.value || 'Expense';
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            try {
+                const response = await fetch(BASE_URL + '/expenses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        category_id: categoryId,
+                        amount: amount,
+                        description: description
+                    })
+                });
+
+                if (response.ok) {
+                    alert(`SUCCESS: $${amount.toFixed(2)} added to ${categoryName}!`);
+                    amountInput.value = '';
+                    descInput.value = '';
+                    await loadBudgetData();
+                } else {
+                    alert('Failed to add expense');
+                }
+            } catch (error) {
+                alert('Connection error: ' + error.message);
+            }
+        }
+
+        function updateSavings() {
+            if (budgetData.length === 0) return;
+            
+            const totalBudget = budgetData.reduce((sum, b) => sum + b.limit, 0);
+            const totalSpent = budgetData.reduce((sum, b) => sum + b.spent, 0);
+            const savings = Math.max(0, totalBudget - totalSpent);
+            
+            document.getElementById('savingsAmount').textContent = '$' + savings.toFixed(2);
+        }
+
+        async function refreshData() {
+            await loadBudgetData();
+        }
+
+        function handleLogout() {
+            user = null;
+            categories = [];
+            budgetData = [];
+            isLoginMode = true;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('budgetSetupSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('authForm').reset();
+            document.getElementById('loginMessage').textContent = '';
+            
+            // Reset to login mode
+            document.getElementById('authTitle').textContent = 'Login to Budget Tracker';
+            document.getElementById('authButton').textContent = 'Login';
+            document.getElementById('toggleAuth').textContent = "Don't have an account? Register here";
+            document.getElementById('nameGroup').style.display = 'none';
+            document.getElementById('savingsGroup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
