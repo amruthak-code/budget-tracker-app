@@ -343,4 +343,23 @@ if __name__ == '__main__':
         init_db()
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
 
+@app.route('/api/test-email', methods=['POST'])
+def test_email():
+    """Test endpoint to verify email configuration"""
+    data = request.get_json()
+    to_email = data.get('to_email')
+    subject = data.get('subject', 'Budget Tracker - Test Email')
+    message = data.get('message', 'This is a test email from Budget Tracker')
+    
+    if not to_email:
+        return jsonify({'error': 'Email address required'}), 400
+    
+    try:
+        if send_email(to_email, subject, message):
+            return jsonify({'message': 'Email sent successfully!'}), 200
+        else:
+            return jsonify({'error': 'Failed to send email. Check EMAIL_USER and EMAIL_PASSWORD in .env'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
