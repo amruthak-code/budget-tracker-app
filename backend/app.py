@@ -15,13 +15,9 @@ app = Flask(__name__)
 # Enable CORS for frontend-backend communication
 CORS(app, resources={
     r"/api/*": {
-        "origins": [
-            "https://sparkly-buttercream-7ea946.netlify.app",
-            "http://localhost:4000",
-            "http://localhost:3000"
-        ],
+        "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type", "Authorization"]
     }
 })
 
