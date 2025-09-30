@@ -12,7 +12,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend-backend communication
+# Enable CORS for frontend-backend communication
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "https://sparkly-buttercream-7ea946.netlify.app",
+            "http://localhost:4000",
+            "http://localhost:3000"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///budget_tracker.db')
