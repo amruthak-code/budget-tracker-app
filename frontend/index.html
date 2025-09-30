@@ -254,7 +254,7 @@
             messageDiv.style.color = '#666';
             
             try {
-                const response = await fetch(BASE_URL + '/login', {
+                const response = await fetch(BASE_URL + '/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email, password: password })
@@ -294,7 +294,7 @@
             messageDiv.style.color = '#666';
             
             try {
-                const response = await fetch(BASE_URL + '/register', {
+                const response = await fetch(BASE_URL + '/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -330,7 +330,7 @@
 
         async function loadCategories() {
             try {
-                const response = await fetch(BASE_URL + '/categories');
+                const response = await fetch(BASE_URL + '/api/categories');
                 if (response.ok) {
                     categories = await response.json();
                 }
@@ -439,7 +439,7 @@
             messageDiv.style.color = '#666';
             
             try {
-                const response = await fetch(BASE_URL + '/budget-limits', {
+                const response = await fetch(BASE_URL + '/api/budget-limits', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -479,7 +479,7 @@
             if (!user) return;
             
             try {
-                const response = await fetch(BASE_URL + '/budget-status/' + user.id);
+                const response = await fetch(BASE_URL + '/api/budget-status/' + user.id);
                 if (response.ok) {
                     budgetData = await response.json();
                     renderCategories();
@@ -537,7 +537,7 @@
             }
 
             try {
-                const response = await fetch(BASE_URL + '/expenses', {
+                const response = await fetch(BASE_URL + '/api/expenses', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
